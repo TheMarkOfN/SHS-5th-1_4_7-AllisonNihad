@@ -1,0 +1,141 @@
+import PIL
+from PIL import ImageFilter  
+import matplotlib.pyplot as plt
+import os.path
+import PIL.ImageDraw
+
+def get_images(directory=None):
+    if directory == None:
+        directory = os.getcwd() # Use working directory if unspecified
+        
+    image_list = [] # Initialize aggregaotrs
+    file_list = []
+    
+    directory_list = os.listdir(directory) # Get list of files
+    for entry in directory_list:
+        absolute_filename = os.path.join(directory, entry)
+        try:
+            image = PIL.Image.open(absolute_filename)
+            file_list += [entry]
+            image_list += [image]
+        except IOError:
+            pass # do nothing with errors tying to open non-images
+    return image_list, file_list 
+    
+def frame_image(image, wide, r,g,b):
+    width, height = image.size
+    frame = PIL.Image.new('RGBA', (width, height), (0,0,0,0))
+    drawing_layer = PIL.ImageDraw.Draw(frame)
+    drawing_layer.rectangle([(width/wide,height/wide), ((width/wide)*(wide-1),(height/wide)*(wide-1))],fill=(127,0,127,255))
+    result = PIL.Image.new('RGBA', image.size, (r,g,b,255))
+    result.paste(image, (0,0), mask=frame)
+    return image
+    
+            
+def frame_all_images(r,g,b, thickness, directory=None):
+    ''' Frames all images in working directory,
+        stores them in a folder called "1.4.7 modified frame images" '''
+        
+    if directory == None:
+        directory = os.getcwd()
+        
+    new_directory = os.path.join(directory, '1.4.7 modified frame images')
+    try:
+        os.mkdir(new_directory)
+    except OSError:
+        pass
+    
+    image_list, file_list = get_images(directory)  
+
+    for n in range(len(image_list)):
+        filename, filetype = file_list[n].split('.')
+                
+        framed_image = frame_image(image_list[n], r,g,b, thickness)
+        
+        framed_image_filename = os.path.join(new_directory, filename + '.png')
+        framed_image.save(framed_image_filename)
+        
+def tint_image(image, r,g,b):
+    result = PIL.Image.new('RGBA', image.size, (r,g,b,105))
+    image.paste(result,(0,0),result)
+    return image
+        
+def tint_all_images(r,g,b, directory=None):
+    ''' Tints all images in working directory,
+        stores them in a folder called "1.4.7 modified tint images" '''
+        
+    if directory == None:
+        directory = os.getcwd()
+        
+    new_directory = os.path.join(directory, '1.4.7 modified tint images')
+    try:
+        os.mkdir(new_directory)
+    except OSError:
+        pass
+    
+    image_list, file_list = get_images(directory)  
+
+    for n in range(len(image_list)):
+        filename, filetype = file_list[n].split('.')
+                
+        tinted_image = tint_image(image_list[n], r,g,b,)
+        
+        tinted_image_filename = os.path.join(new_directory, filename + '.png')
+        tinted_image.save(tinted_image_filename)
+        
+def blur_image(image, radius):
+    blur = image.filter(ImageFilter.GaussianBlur(radius))
+    image.paste(blur,(0,0))
+    return image
+
+def blur_all_images(radius, directory=None):
+    ''' Blurs all images in working directory,
+        stores them in a folder called "1.4.7 modified blur images" '''
+        
+    if directory == None:
+        directory = os.getcwd()
+        
+    new_directory = os.path.join(directory, '1.4.7 modified blur images')
+    try:
+        os.mkdir(new_directory)
+    except OSError:
+        pass
+    
+    image_list, file_list = get_images(directory)  
+
+    for n in range(len(image_list)):
+        filename, filetype = file_list[n].split('.')
+                
+        blurred_image = blur_image(image_list[n], radius)
+        
+        blurred_image_filename = os.path.join(new_directory, filename + '.png')
+        blurred_image.save(blurred_image_filename)
+        
+def contour_image(image):
+    contour = image.filter(ImageFilter.CONTOUR)
+    image.paste(contour,(0,0))
+    return image
+    
+def contour_all_images(directory=None):
+    ''' Blurs all images in working directory,
+        stores them in a folder called "1.4.7 modified contour images" '''
+        
+    if directory == None:
+        directory = os.getcwd()
+        
+    new_directory = os.path.join(directory, '1.4.7 modified contour images')
+    try:
+        os.mkdir(new_directory)
+    except OSError:
+        pass
+    
+    image_list, file_list = get_images(directory)  
+
+    for n in range(len(image_list)):
+        filename, filetype = file_list[n].split('.')
+                
+        contoured_image = contour_image(image_list[n])
+        
+        contoured_image_filename = os.path.join(new_directory, filename + '.png')
+        contoured_image.save(contoured_image_filename)
+    
