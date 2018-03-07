@@ -22,17 +22,22 @@ def get_images(directory=None):
             pass # do nothing with errors tying to open non-images
     return image_list, file_list 
     
-def frame_image(image, wide, r,g,b):
+def frame_image(image, wide, color):
+    r,b,g = color
     width, height = image.size
+    thickness = int(wide * min(width, height)) # thickness in pixels
     frame = PIL.Image.new('RGBA', (width, height), (0,0,0,0))
     drawing_layer = PIL.ImageDraw.Draw(frame)
-    drawing_layer.rectangle([(width/wide,height/wide), ((width/wide)*(wide-1),(height/wide)*(wide-1))],fill=(127,0,127,255))
+    drawing_layer.rectangle((0,0, width, thickness), fill =(r,g,b, 255)) # top rectangle
+    drawing_layer.rectangle((0,height-thickness, height, width), fill = (r,g,b, 255))
+    #drawing_layer.rectangle([(width/wide,height/wide), ((width/wide)*(wide-1),(height/wide)*(wide-1))],fill=(127,0,127,255))
+    
     result = PIL.Image.new('RGBA', image.size, (r,g,b,255))
     result.paste(image, (0,0), mask=frame)
     return image
     
             
-def frame_all_images(r,g,b, thickness, directory=None):
+def frame_all_images(color=(255,0,0), thickness=.1, directory=None):
     ''' Frames all images in working directory,
         stores them in a folder called "1.4.7 modified frame images" '''
         
@@ -50,7 +55,7 @@ def frame_all_images(r,g,b, thickness, directory=None):
     for n in range(len(image_list)):
         filename, filetype = file_list[n].split('.')
                 
-        framed_image = frame_image(image_list[n], r,g,b, thickness)
+        framed_image = frame_image(image_list[n], color, thickness)
         
         framed_image_filename = os.path.join(new_directory, filename + '.png')
         framed_image.save(framed_image_filename)
